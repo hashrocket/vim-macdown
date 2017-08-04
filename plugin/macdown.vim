@@ -34,7 +34,7 @@ function! MacDownHandleScriptFinished(job, status)
   if a:status == 0
     call s:EchoSuccess("MacDown refreshed ♻️ ")
   else
-    call s:EchoError("[FAIL] MacDown may not be installed")
+    call s:EchoError("[FAIL] Run :InstallMacDown to download MacDown")
   endif
 endfunction
 
@@ -45,6 +45,37 @@ endfunction
 function! s:EchoError(msg)
   redraw | echohl ErrorMsg | echom "vim-macdown: " . a:msg | echohl None
 endfunction
+
+function! s:EchoProgress(msg)
+  redraw | echohl Identifier | echom "vim-macdown: " . a:msg | echohl None
+endfunction
+
+function! s:InstallMacDown()
+  call s:EchoProgress("MacDown is downloading ⏳ ")
+  let tmpdir   = "~/.md-tmp"
+  let zipfile  = tmpdir."/macdown.zip"
+
+  let mkdir    = "mkdir -p ".tmpdir." && "
+  let download = "curl -L https://github.com/MacDownApp/macdown/releases/download/v0.7.1/MacDown.app.zip -o ".zipfile." && "
+  let unzip    = "unzip -o ".zipfile." -d ".tmpdir." >> /dev/null 2>&1"." && "
+  let cleanup  = "rm -f ".zipfile." && "
+  let link     = "ln -Ffs /Applications ".tmpdir."/Applications"." && "
+  let install  = "open ".tmpdir
+
+
+  let full_command = mkdir.download.unzip.cleanup.link.install
+  call job_start(["bash", "-c", full_command], {"exit_cb": "MacDownHandleDownloadFinished"})
+endfunction
+
+function! MacDownHandleDownloadFinished(job, status)
+  if a:status == 0
+    call s:EchoSuccess("MacDown downloaded ✅  ")
+  else
+    call s:EchoError("[FAIL] MacDown could not be downloaded. ".a:job)
+  endif
+endfunction
+
+command InstallMacDown :execute s:InstallMacDown()
 
 nnoremap <leader>p :call <SID>MacDownMarkdownPreview()<cr>
 
