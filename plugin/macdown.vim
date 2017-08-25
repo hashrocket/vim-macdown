@@ -27,7 +27,23 @@ set cpo&vim
 function! s:MacDownMarkdownPreview()
   let path = expand("%p")
   let refresh = "osascript -e 'tell application \"MacDown\" to close window 1' ; open -g -F ".path." -a \"MacDown\""
-  call job_start(["bash", "-c", refresh])
+  call job_start(["bash", "-c", refresh], {"exit_cb": "MacDownHandleScriptFinished"})
+endfunction
+
+function! MacDownHandleScriptFinished(job, status)
+  if a:status == 0
+    call s:EchoSuccess("MacDown refreshed ♻️ ")
+  else
+    call s:EchoError("[FAIL] MacDown may not be installed")
+  endif
+endfunction
+
+function! s:EchoSuccess(msg)
+  redraw | echohl Function | echom "vim-macdown: " . a:msg | echohl None
+endfunction
+
+function! s:EchoError(msg)
+  redraw | echohl ErrorMsg | echom "vim-macdown: " . a:msg | echohl None
 endfunction
 
 nnoremap <leader>p :call <SID>MacDownMarkdownPreview()<cr>
