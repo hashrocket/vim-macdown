@@ -8,7 +8,7 @@ if exists('g:loaded_vim_macdown')
 endif
 let g:loaded_vim_macdown = 1
 
-if !has('macunix') || !(system('uname') =~ "Darwin")
+if !has('macunix') && !(system('uname') =~ "Darwin")
   echo 'macdown.vim only works on a Mac'
   finish
 endif
