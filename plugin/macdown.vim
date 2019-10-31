@@ -27,7 +27,11 @@ set cpo&vim
 function! s:MacDownMarkdownPreview()
   let path = expand("%p")
   let refresh = "osascript -e 'tell application \"MacDown\" to close window 1' ; open -g -F ".path." -a \"MacDown\""
-  call job_start(["bash", "-c", refresh], {"exit_cb": "MacDownHandleScriptFinished"})
+  if has('nvim')
+    call jobstart(["bash", "-c", refresh], {"exit_cb": "MacDownHandleScriptFinished"})
+  else
+    call job_start(["bash", "-c", refresh], {"exit_cb": "MacDownHandleScriptFinished"})
+  endif
 endfunction
 
 function! MacDownHandleScriptFinished(job, status)
@@ -64,7 +68,11 @@ function! s:InstallMacDown()
 
 
   let full_command = mkdir.download.unzip.cleanup.link.install
-  call job_start(["bash", "-c", full_command], {"exit_cb": "MacDownHandleDownloadFinished"})
+  if has('nvim')
+    call jobstart(["bash", "-c", full_command], {"exit_cb": "MacDownHandleDownloadFinished"})
+  else
+    call job_start(["bash", "-c", full_command], {"exit_cb": "MacDownHandleDownloadFinished"})
+  endif
 endfunction
 
 function! MacDownHandleDownloadFinished(job, status)
