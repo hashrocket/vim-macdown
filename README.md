@@ -17,8 +17,23 @@ To install `macdown.vim`, use your favorite Vim plugin manager (e.g.
 Plug 'hashrocket/vim-macdown'
 ```
 
+
+**On demand**:
+
+* `<leader>p` (`\p` with default vim config)
+* `:MacDownPreview` to invoke by name or in a script
+
 Make some edits to a markdown file and then hit `<leader>p` to view a
 preview in Macdown.
+
+**On save for *.md files**:
+
+Add the following to your `.vimrc`:
+
+```vimscript
+" execute commands on filetype save
+autocmd BufWritePost *.md exec :MacDownPreview
+```
 
 ### License
 

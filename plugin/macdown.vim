@@ -84,8 +84,9 @@ function! MacDownHandleDownloadFinished(job, status)
 endfunction
 
 command InstallMacDown :execute s:InstallMacDown()
+command MacDownPreview :call <SID>MacDownMarkdownPreview()
 
-nnoremap <leader>p :call <SID>MacDownMarkdownPreview()<cr>
+nnoremap <leader>p :MacDownPreview<cr>
 
 
 let &cpo = s:save_cpo
