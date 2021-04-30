@@ -7,6 +7,7 @@ if exists('g:loaded_vim_macdown')
   finish
 endif
 let g:loaded_vim_macdown = 1
+let g:macdown_enabled = 1
 
 if !has('macunix') && !(system('uname') =~ "Darwin")
   echo 'macdown.vim only works on a Mac'
@@ -25,6 +26,10 @@ set cpo&vim
 
 
 function! s:MacDownMarkdownPreview()
+  if g:macdown_enabled == 0
+    return 0
+  endif
+
   let path = expand("%p")
   let refresh = "osascript -e 'tell application \"MacDown\" to close window 1' ; open -g -F ".path." -a \"MacDown\""
   if has('nvim')
@@ -83,8 +88,54 @@ function! MacDownHandleDownloadFinished(job, status)
   endif
 endfunction
 
+function! s:MacDownClose()
+  if g:macdown_enabled == 0
+    return 0
+  endif
+
+  let close_cmd = "osascript -e 'tell application \"MacDown\" to close window 1'"
+  if has('nvim')
+    call jobstart(["bash", "-c", close_cmd], {"exit_cb": "MacDownHandleCloseFinished"})
+  else
+    call job_start(["bash", "-c", close_cmd], {"exit_cb": "MacDownHandleCloseFinished"})
+  endif
+endfunction
+
+function! MacDownHandleCloseFinished(job, status)
+  if a:status == 0
+    call s:EchoSuccess("MacDown closed")
+  else
+    call s:EchoError("[FAIL] Run :MacDownClose to close MacDown")
+  endif
+endfunction
+
+function! s:MacDownExit()
+  if g:macdown_enabled == 0
+    return 0
+  endif
+
+  " Necessary when exiting vim.  If use job_start, Vim will exit and MacDown
+  " will not close
+  let tmp = system("bash -c \"osascript -e 'tell application \"'\"'\"MacDown\"'\"'\" to close window 1'\"")
+endfunction
+
+function! s:MacDownOn()
+  let g:macdown_enabled = 1
+    call s:EchoSuccess("MacDown enabled")
+endfunction
+
+function! s:MacDownOff()
+  let g:macdown_enabled = 0
+    call s:EchoSuccess("MacDown disabled")
+endfunction
+
+
 command InstallMacDown :execute s:InstallMacDown()
 command MacDownPreview :call <SID>MacDownMarkdownPreview()
+command MacDownClose :call <SID>MacDownClose()
+command MacDownExit :call <SID>MacDownExit()
+command MacDownOff :call <SID>MacDownOff()
+command MacDownOn :call <SID>MacDownOn()
 
 nnoremap <leader>p :MacDownPreview<cr>
 
