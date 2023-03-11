@@ -39,7 +39,7 @@ Add the following to your `.vimrc`:
 
 ```vimscript
 " execute commands on filetype save
-autocmd BufWritePost *.md exec :MacDownPreview
+autocmd BufWritePost *.md :MacDownPreview
 ```
 
 #### On close .md file
