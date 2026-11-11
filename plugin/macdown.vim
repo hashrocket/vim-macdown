@@ -30,7 +30,7 @@ function! s:MacDownMarkdownPreview()
     return 0
   endif
 
-  let path = expand("%p")
+  let path = shellescape(expand("%:p"))
   let refresh = "osascript -e 'tell application \"MacDown\" to close window 1' ; open -g -F ".path." -a \"MacDown\""
   if has('nvim')
     call jobstart(["bash", "-c", refresh], {"exit_cb": "MacDownHandleScriptFinished"})
